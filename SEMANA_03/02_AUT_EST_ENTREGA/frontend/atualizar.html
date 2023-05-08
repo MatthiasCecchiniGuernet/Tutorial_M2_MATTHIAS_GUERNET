@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width" />
+    <title>CRUD</title>
+  </head>
+  <h1>Atualização de Usuário</h1>
+
+  <body>
+    <form name="form1" method="post" action="/backend/atualizaCurriculo">
+      NOME COMPLETO: <input type="text" id="nome" name="nome" size="50" value="">
+      <br>
+      CARGO: <input type="text" id="cargo" name="cargo" value="">
+      <br>
+      ENDEREÇO: <input type="text" id="endereco" name="endereco" value="">
+
+      EMAIL: <input type="email" id="email" name="email" value="">
+      <br>
+      TELEFONE: <input type="tel" id="telefone" name="telefone" value="">
+      <br>
+      <input type="hidden" id="id" name="id" value="">
+        
+      <input type="submit" value="ATUALIZAR">  
+    </form>    
+
+    <script>
+      let url = new URL(window.location.href);
+      let params = url.searchParams;
+      url = '/atualizaCurriculo?id=' + url.searchParams.get("id");
+
+      fetch(url)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          let usuarios = data[0];
+
+          usuarios.map(function(usuario) {
+            document.getElementById('id').value = usuario.id;
+            document.getElementById('nome').value = usuario.Nome;
+            document.getElementById('cargo').value = usuario.cargo;
+            document.getElementById('endereco').value = usuario.endereco;
+            document.getElementById('email').value = usuario.email;
+            document.getElementById('telefone').value = usuario.telefone;
+          });
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    </script>
+  </body>
+</html>
