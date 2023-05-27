@@ -10,21 +10,35 @@
   <p><a href="/inserir.html">INSERIR NOVO USUÁRIO</a></p>
 
   <script>
-    const url = '/usuarios';
+    const url = '/listar';
   
     fetch(url)
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        let usuarios = data;
-        let saida = '';
-        usuarios.map(function(usuario) {
-          saida += '<strong> '+ `${usuario.nome_completo}` + '</strong> ' + `${usuario.email}`  + ' - ' +  `${usuario.telefone}`;
-          saida += ' - <a href="/atualizar.html?userId=' + `${usuario.userId}` + '">EDITAR</a>';
-          saida += ' | <a href="/removeUsuario?userId='+`${usuario.userId}`+'">REMOVER</a></br>';
-        });
-        document.getElementById('resultado').innerHTML = saida;
+        let usuarios = data.usuarios;
+        let projetos = data.projetos;
+        let saidaUsuarios = '';
+        let saidaProjetos = '';
+        for(let i = 0; i < usuarios.length; i++) {
+          const usuario = usuarios[i];
+          saidaUsuarios += `
+            <strong>${usuario.nome_completo}</strong> ${usuario.email} - ${usuario.telefone}
+            - <a href="/atualizar.html?userId=${usuario.userId}">EDITAR</a>
+            | <a href="/removeUsuario?userId=${usuario.userId}">REMOVER</a></br>
+          `;
+        }
+
+        for(let j = 0; j < projetos.length; j++) {
+          const projeto = projetos[j];
+          saidaProjetos += `
+            <strong>${projeto.id}</strong> ${projeto.nome} </br>
+          `;
+        }
+        
+        document.getElementById('usuarios').innerHTML = saidaUsuarios;
+        document.getElementById('projetos').innerHTML = saidaProjetos;
       })
       .catch(function(error) {
         console.log(error);
@@ -34,6 +48,9 @@
   </script>
 
   <body>
-    <div id="resultado"></div>
+    <h1>USUÁRIOS</h1>
+    <div id="usuarios"></div>
+    <h1>PROJETOS</h1>
+    <div id="projetos"></div>
   </body>
 </html>

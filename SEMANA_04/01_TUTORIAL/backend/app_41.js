@@ -3,30 +3,47 @@ const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 const sqlite3 = require('sqlite3').verbose();
-const DBPATH = '../data/dbUser.db';
+const DBPATH = 'data/dbUser.db';
 
 const hostname = '127.0.0.1';
 const port = 3000;
 const app = express();
 
 /* Colocar toda a parte estática no frontend */
-app.use(express.static("../frontend/"));
+app.use(express.static("frontend/"));
 
 /* Definição dos endpoints */
 /******** CRUD ************/
 app.use(express.json());
 
 // Retorna todos registros (é o R do CRUD - Read)
-app.get('/usuarios', (req, res) => {
+app.get('/listar', (req, res) => {
 	res.statusCode = 200;
 	res.setHeader('Access-Control-Allow-Origin', '*');
 	var db = new sqlite3.Database(DBPATH); // Abre o banco
-	var sql = 'SELECT * FROM usuario ORDER BY nome_completo COLLATE NOCASE';
-		db.all(sql, [],  (err, rows ) => {
-			if (err) {
-				throw err;
+	var sql1 = 'SELECT * FROM usuario ORDER BY nome_completo COLLATE NOCASE';
+		
+	db.all(sql1, [],  (err1, rows1 ) => {
+			if (err1) {
+				throw err1;
 			}
-			res.json(rows);
+			var sql2 = 'SELECT * FROM projeto';
+			db.all(sql2, [],  (err2, rows2 ) => {
+				if (err2) {
+					throw err2;
+				}
+
+				const retorno = {
+					usuarios: rows1,
+					projetos: rows2
+				};
+
+				res.json(retorno);
+				// res.render("xxx", {
+				// 	usuarios: rows1,
+				// 	projetos: rows2
+				// })
+			});
 		});
 		db.close(); // Fecha o banco
 });
@@ -38,7 +55,7 @@ app.post('/insereUsuario', urlencodedParser, (req, res) => {
 	var db = new sqlite3.Database(DBPATH); // Abre o banco
 	sql = "INSERT INTO usuario (nome_completo, email, telefone) VALUES ('" + req.body.nome + "', '" + req.body.email + "', " + req.body.telefone + ")";
 	console.log(sql);
-	db.run(sql, [],  err => {
+	db.all(sql, [],  err => {
 		if (err) {
 		    throw err;
 		}	
@@ -71,7 +88,7 @@ app.post('/atualizaUsuario', urlencodedParser, (req, res) => {
 	sql = "UPDATE usuario SET nome_completo='" + req.body.nome + "', email = '" + req.body.email + "' , telefone='" + req.body.telefone + "' WHERE userId='" + req.body.userId + "'";
 	console.log(sql);
 	var db = new sqlite3.Database(DBPATH); // Abre o banco
-	db.run(sql, [],  err => {
+	db.all(sql, [],  err => {
 		if (err) {
 		    throw err;
 		}
@@ -88,7 +105,7 @@ app.get('/removeUsuario', urlencodedParser, (req, res) => {
 	sql = "DELETE FROM usuario WHERE userId='" + req.query.userId + "'";
 	console.log(sql);
 	var db = new sqlite3.Database(DBPATH); // Abre o banco
-	db.run(sql, [],  err => {
+	db.all(sql, [],  err => {
 		if (err) {
 		    throw err;
 		}
